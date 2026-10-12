@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laboratori d'envol – 翼型查看器</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .app {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 24px;
+            max-width: 1300px;
+            width: 100%;
+        }
+        .app-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+        .app-header h1 {
+            font-size: 22px;
+            font-weight: 600;
+            color: #1a2634;
+            letter-spacing: -0.3px;
+        }
+        .app-header h1 small {
+            font-weight: 400;
+            font-size: 14px;
+            color: #6b7a8a;
+            margin-left: 8px;
+        }
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            align-items: center;
+        }
+        .toolbar button,
+        .toolbar label {
+            background: #f8f9fc;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            padding: 7px 14px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a2634;
+            cursor: pointer;
+            transition: all 0.15s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            user-select: none;
+            white-space: nowrap;
+        }
+        .toolbar button:hover,
+        .toolbar label:hover {
+            background: #e8ecf3;
+            border-color: #b0bac8;
+        }
+        .toolbar button:active {
+            transform: scale(0.96);
+        }
+        .toolbar input[type="file"] {
+            display: none;
+        }
+        .toolbar .color-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            background: #f8f9fc;
+            border: 1px solid #d0d7e2;
+            border-radius: 8px;
+            padding: 4px 8px 4px 12px;
+        }
+        .toolbar .color-group label {
+            border: none;
+            background: transparent;
+            padding: 0 4px;
+            font-size: 12px;
+            color: #4a5a6a;
+        }
+        .toolbar .color-group input[type="color"] {
+            width: 28px;
+            height: 28px;
+            border: 1px solid #d0d7e2;
+            border-radius: 6px;
+            padding: 2px;
+            background: #fff;
+            cursor: pointer;
+        }
+        .toolbar .color-group input[type="color"]::-webkit-color-swatch-wrapper {
+            padding: 0;
+        }
+        .toolbar .color-group input[type="color"]::-webkit-color-swatch {
+            border: none;
+            border-radius: 4px;
+        }
+        .toggle-points-btn {
+            font-size: 16px;
+            padding: 6px 12px;
+            min-width: 44px;
+            justify-content: center;
+        }
+        .toggle-points-btn.active {
+            background: #e8ecf3;
+            border-color: #b0bac8;
+        }
+        .canvas-wrap {
+            position: relative;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            touch-action: none;
+        }
+        .canvas-wrap canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #ffffff;
+            cursor: grab;
+            touch-action: none;
+        }
+        .canvas-wrap canvas:active {
+            cursor: grabbing;
+        }
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+            font-size: 13px;
+            color: #4a5a6a;
+        }
+        .status-bar .coords {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #6b7a8a;
+        }
+        .legend {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+            align-items: center;
+            padding: 6px 0 2px 0;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            font-weight: 500;
+            color: #1a2634;
+        }
+        .legend-item .swatch {
+            width: 28px;
+            height: 4px;
+            border-radius: 4px;
+        }
+        .legend-item .dot-swatch {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+        }
+        .grid-toggle {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #4a5a6a;
+        }
+        .grid-toggle input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            accent-color: #2c3e50;
+            cursor: pointer;
+        }
+        @media (max-width: 700px) {
+            .app {
+                padding: 14px;
+            }
+            .app-header h1 {
+                font-size: 18px;
+            }
+            .toolbar button,
+            .toolbar label {
+                font-size: 12px;
+                padding: 5px 10px;
+            }
+            .legend {
+                gap: 10px;
+            }
+            .legend-item {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app">
+        <div class="app-header">
+            <h1>🪂 翼型查看器 <small>Laboratori d'envol</small></h1>
+            <div class="toolbar">
+                <label for="fileInputLE">📂 加载 txt LE 翼型</label>
+                <input type="file" id="fileInputLE" accept=".txt">
+                <label for="fileInputDAT">📂 加载 dat 翼型</label>
+                <input type="file" id="fileInputDAT" accept=".dat,.txt">
+                <button id="fitBtn">⊡ 适应视图</button>
+                <button id="resetViewBtn">⟲ 重置</button>
+                <button id="savePngBtn">💾 保存 PNG</button>
+                <button id="togglePointsBtn" class="toggle-points-btn active" title="显示/隐藏点">●</button>
+                <div class="grid-toggle">
+                    <input type="checkbox" id="gridToggle" checked>
+                    <label for="gridToggle">网格</label>
+                </div>
+                <div class="color-group">
+                    <label>外弧</label>
+                    <input type="color" id="extradosLineColor" value="#e74c3c">
+                </div>
+                <div class="color-group">
+                    <label>入口</label>
+                    <input type="color" id="inletLineColor" value="#f1c40f">
+                </div>
+                <div class="color-group">
+                    <label>内弧</label>
+                    <input type="color" id="intradosLineColor" value="#27ae60">
+                </div>
+                <div class="color-group">
+                    <label>点</label>
+                    <input type="color" id="pointColorPicker" value="#000000">
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-wrap" id="canvasWrap">
+            <canvas id="canvas"></canvas>
+        </div>
+
+        <div class="status-bar">
+            <div>
+                <span class="coords" id="mouseCoords">x: —  y: —</span>
+            </div>
+            <div class="legend" id="legendContainer">
+                <!-- 图例由 JavaScript 管理 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  数据: gnu-A (内嵌) - LE 格式
+        // ============================================================
+        const GNU_A_DATA = {
+            format: 'le',
+            name: "gnu-A",
+            total: 140,
+            extradosCount: 84,
+            inletCount: 10,
+            intradosCount: 48,
+            points: [
+                [1.000000, 0.000000],
+                [0.991040, 0.001990],
+                [0.975850, 0.005330],
+                [0.958560, 0.009120],
+                [0.939410, 0.013280],
+                [0.918750, 0.017720],
+                [0.897020, 0.022360],
+                [0.874620, 0.027080],
+                [0.851840, 0.031830],
+                [0.828840, 0.036560],
+                [0.805710, 0.041250],
+                [0.782520, 0.045880],
+                [0.759350, 0.050440],
+                [0.736190, 0.054900],
+                [0.712980, 0.059270],
+                [0.689760, 0.063560],
+                [0.666540, 0.067760],
+                [0.643260, 0.071880],
+                [0.619940, 0.075930],
+                [0.596580, 0.079900],
+                [0.573200, 0.083810],
+                [0.549850, 0.087640],
+                [0.526530, 0.091380],
+                [0.503240, 0.095030],
+                [0.480010, 0.098590],
+                [0.456850, 0.102030],
+                [0.433760, 0.105360],
+                [0.410790, 0.108560],
+                [0.387930, 0.111610],
+                [0.365230, 0.114530],
+                [0.342810, 0.117270],
+                [0.320780, 0.119810],
+                [0.299220, 0.122100],
+                [0.278250, 0.124090],
+                [0.257990, 0.125780],
+                [0.238630, 0.127100],
+                [0.220240, 0.127990],
+                [0.202880, 0.128440],
+                [0.186530, 0.128380],
+                [0.171170, 0.127840],
+                [0.156780, 0.126800],
+                [0.143300, 0.125260],
+                [0.130670, 0.123230],
+                [0.118860, 0.120730],
+                [0.107810, 0.117750],
+                [0.097470, 0.114300],
+                [0.087790, 0.110380],
+                [0.078730, 0.106040],
+                [0.070280, 0.101330],
+                [0.062410, 0.096340],
+                [0.055130, 0.091150],
+                [0.048430, 0.085820],
+                [0.042320, 0.080430],
+                [0.036770, 0.075030],
+                [0.031770, 0.069690],
+                [0.027290, 0.064450],
+                [0.023280, 0.059350],
+                [0.019740, 0.054390],
+                [0.016610, 0.049610],
+                [0.013860, 0.045010],
+                [0.011460, 0.040580],
+                [0.009380, 0.036340],
+                [0.007580, 0.032260],
+                [0.006040, 0.028360],
+                [0.004730, 0.024620],
+                [0.003650, 0.021040],
+                [0.002750, 0.017610],
+                [0.001980, 0.014340],
+                [0.001390, 0.011200],
+                [0.000900, 0.008210],
+                [0.000460, 0.005350],
+                [0.000140, 0.002620],
+                [0.000000, -0.000000],
+                [0.000070, -0.002580],
+                [0.000140, -0.005220],
+                [0.000440, -0.007860],
+                [0.001250, -0.010470],
+                [0.002270, -0.013120],
+                [0.003540, -0.015740],
+                [0.005220, -0.018250],
+                [0.007240, -0.020670],
+                [0.009630, -0.022930],
+                [0.012350, -0.025080],
+                [0.016000, -0.027497],
+                [0.018670, -0.029190],
+                [0.022290, -0.031230],
+                [0.026250, -0.033270],
+                [0.030610, -0.035280],
+                [0.035410, -0.037290],
+                [0.040720, -0.039280],
+                [0.046630, -0.041290],
+                [0.053210, -0.043320],
+                [0.063000, -0.046011],
+                [0.068890, -0.047530],
+                [0.078270, -0.049740],
+                [0.088880, -0.052010],
+                [0.100870, -0.054350],
+                [0.114320, -0.056730],
+                [0.129250, -0.059100],
+                [0.145560, -0.061390],
+                [0.163110, -0.063520],
+                [0.181770, -0.065460],
+                [0.201330, -0.067170],
+                [0.221610, -0.068660],
+                [0.242420, -0.069920],
+                [0.263600, -0.070940],
+                [0.285060, -0.071720],
+                [0.306670, -0.072250],
+                [0.328370, -0.072540],
+                [0.350110, -0.072580],
+                [0.371900, -0.072350],
+                [0.393810, -0.071850],
+                [0.415850, -0.071110],
+                [0.438050, -0.070120],
+                [0.460410, -0.068920],
+                [0.482910, -0.067540],
+                [0.505480, -0.065960],
+                [0.528150, -0.064210],
+                [0.550890, -0.062290],
+                [0.573650, -0.060220],
+                [0.596450, -0.057970],
+                [0.619290, -0.055570],
+                [0.642190, -0.053020],
+                [0.665130, -0.050330],
+                [0.688100, -0.047490],
+                [0.711140, -0.044510],
+                [0.734230, -0.041400],
+                [0.757370, -0.038170],
+                [0.780610, -0.034820],
+                [0.803880, -0.031390],
+                [0.827160, -0.027860],
+                [0.850370, -0.024300],
+                [0.873360, -0.020710],
+                [0.895960, -0.017110],
+                [0.917920, -0.013580],
+                [0.938800, -0.010180],
+                [0.958150, -0.007000],
+                [0.975610, -0.004100],
+                [0.990950, -0.001530],
+                [1.000000, 0.000000]
+            ]
+        };
+
+        // ============================================================
+        //  状态
+        // ============================================================
+        let profileData = null;
+        let view = { offsetX: 0.5, offsetY: 0, scale: 200 };
+        let isDragging = false;
+        let dragStart = { x: 0, y: 0 };
+        let viewStart = { x: 0, y: 0 };
+        let showGrid = true;
+        let showPoints = true;
+        let lineColors = { extrados: '#e74c3c', inlet: '#f1c40f', intrados: '#27ae60', contour: '#e74c3c' };
+        let pointColors = { extrados: '#000000', inlet: '#000000', intrados: '#000000', contour: '#000000' };
+        let pointSize = 4;
+
+        // DOM 引用
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const wrap = document.getElementById('canvasWrap');
+        const fileInputLE = document.getElementById('fileInputLE');
+        const fileInputDAT = document.getElementById('fileInputDAT');
+        const fitBtn = document.getElementById('fitBtn');
+        const resetViewBtn = document.getElementById('resetViewBtn');
+        const savePngBtn = document.getElementById('savePngBtn');
+        const togglePointsBtn = document.getElementById('togglePointsBtn');
+        const gridToggle = document.getElementById('gridToggle');
+        const extradosLinePicker = document.getElementById('extradosLineColor');
+        const inletLinePicker = document.getElementById('inletLineColor');
+        const intradosLinePicker = document.getElementById('intradosLineColor');
+        const pointColorPicker = document.getElementById('pointColorPicker');
+        const mouseCoordsEl = document.getElementById('mouseCoords');
+        const legendContainer = document.getElementById('legendContainer');
+
+        // ============================================================
+        //  画布尺寸 (比例 2.1:1)
+        // ============================================================
+        function updateCanvasSize() {
+            const rect = wrap.getBoundingClientRect();
+            const w = rect.width || 800;
+            const h = Math.max(300, w / 2.1);
+            canvasW = w;
+            canvasH = h;
+            canvas.width = w * window.devicePixelRatio;
+            canvas.height = h * window.devicePixelRatio;
+            canvas.style.width = w + 'px';
+            canvas.style.height = h + 'px';
+            ctx.setTransform(1, 0, 0, 1, 0, 0);
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+        }
+
+        let canvasW = 800,
+            canvasH = 400;
+        const MARGIN = 45;
+
+        // ============================================================
+        //  坐标变换 (等比例, Y 反向: 正 Y 向上)
+        // ============================================================
+        function dataToCanvas(x, y) {
+            const cx = MARGIN + (x - view.offsetX) * view.scale;
+            const cy = MARGIN + (view.offsetY - y) * view.scale;
+            return { x: cx, y: cy };
+        }
+
+        function canvasToData(cx, cy) {
+            const x = view.offsetX + (cx - MARGIN) / view.scale;
+            const y = view.offsetY - (cy - MARGIN) / view.scale;
+            return { x, y };
+        }
+
+        // ============================================================
+        //  绘图
+        // ============================================================
+        function draw() {
+            if (canvasW === 0 || canvasH === 0) {
+                updateCanvasSize();
+                if (canvasW === 0 || canvasH === 0) {
+                    return;
+                }
+            }
+
+            ctx.clearRect(0, 0, canvasW, canvasH);
+
+            if (!profileData) {
+                drawInfoBox(null);
+                updateLegend();
+                return;
+            }
+
+            if (showGrid) drawGrid();
+
+            const isLE = (profileData.format === 'le');
+            const pts = profileData.points;
+
+            if (isLE) {
+                drawLEProfile(pts);
+            } else {
+                drawDATProfile(pts);
+            }
+
+            drawInfoBox(profileData);
+            updateLegend();
+        }
+
+        // ============================================================
+        //  绘制 LE 翼型 (外弧、入口、内弧)
+        // ============================================================
+        function drawLEProfile(pts) {
+            const eCount = profileData.extradosCount;
+            const iCount = profileData.inletCount;
+            const inletIdx = eCount - 1;
+            const outletIdx = eCount + iCount - 2;
+
+            const extPts = pts.slice(0, eCount);
+            const inPts = pts.slice(inletIdx, outletIdx + 1);
+            const intPts = pts.slice(outletIdx);
+
+            const sections = [
+                { pts: extPts, color: lineColors.extrados },
+                { pts: inPts, color: lineColors.inlet },
+                { pts: intPts, color: lineColors.intrados }
+            ];
+
+            for (const sec of sections) {
+                if (sec.pts.length < 2) continue;
+                ctx.beginPath();
+                for (let i = 0; i < sec.pts.length; i++) {
+                    const p = sec.pts[i];
+                    const c = dataToCanvas(p[0], p[1]);
+                    if (i === 0) ctx.moveTo(c.x, c.y);
+                    else ctx.lineTo(c.x, c.y);
+                }
+                ctx.strokeStyle = sec.color;
+                ctx.lineWidth = 2.2;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+
+            if (showPoints) {
+                const allSections = [
+                    { pts: extPts, color: pointColors.extrados },
+                    { pts: inPts, color: pointColors.inlet },
+                    { pts: intPts, color: pointColors.intrados }
+                ];
+                drawPoints(allSections);
+            }
+
+            const inletPt = extPts[extPts.length - 1];
+            const outletPt = intPts[0];
+            if (inletPt) drawLabel(inletPt[0], inletPt[1], 'inlet', '入口');
+            if (outletPt) drawLabel(outletPt[0], outletPt[1], 'outlet', '出口');
+
+            drawTEMarker(pts[0]);
+        }
+
+        // ============================================================
+        //  绘制 DAT 翼型 (单一轮廓)
+        // ============================================================
+        function drawDATProfile(pts) {
+            if (pts.length >= 2) {
+                ctx.beginPath();
+                for (let i = 0; i < pts.length; i++) {
+                    const p = pts[i];
+                    const c = dataToCanvas(p[0], p[1]);
+                    if (i === 0) ctx.moveTo(c.x, c.y);
+                    else ctx.lineTo(c.x, c.y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = lineColors.contour;
+                ctx.lineWidth = 2.2;
+                ctx.lineJoin = 'round';
+                ctx.lineCap = 'round';
+                ctx.stroke();
+            }
+
+            if (showPoints) {
+                const allSections = [{ pts: pts, color: pointColors.contour }];
+                drawPoints(allSections);
+            }
+
+            drawTEMarker(pts[0]);
+        }
+
+        // ============================================================
+        //  辅助绘制点
+        // ============================================================
+        function drawPoints(sections) {
+            const sz = pointSize * (window.devicePixelRatio || 1);
+            for (const sec of sections) {
+                for (const p of sec.pts) {
+                    const c = dataToCanvas(p[0], p[1]);
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, sz, 0, Math.PI * 2);
+                    ctx.fillStyle = sec.color;
+                    ctx.fill();
+                    ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // ============================================================
+        //  后缘标记 (TE)
+        // ============================================================
+        function drawTEMarker(pt) {
+            if (!pt) return;
+            const c = dataToCanvas(pt[0], pt[1]);
+            const sz = pointSize * (window.devicePixelRatio || 1);
+            ctx.beginPath();
+            ctx.arc(c.x, c.y, sz * 1.6, 0, Math.PI * 2);
+            ctx.fillStyle = '#2c3e50';
+            ctx.fill();
+            ctx.strokeStyle = '#fff';
+            ctx.lineWidth = 1.5;
+            ctx.stroke();
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = '10px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('TE', c.x, c.y - 14);
+        }
+
+        // ============================================================
+        //  信息框
+        // ============================================================
+        function drawInfoBox(data) {
+            if (!data) return;
+            const x = 12,
+                y = 12;
+            const lineHeight = 18;
+            const fontSize = 12;
+            let lines;
+            if (data.format === 'le') {
+                lines = [
+                    '剖面: ' + data.name,
+                    '点数: ' + data.total,
+                    '外弧: ' + data.extradosCount,
+                    '入口: ' + data.inletCount,
+                    '内弧: ' + data.intradosCount
+                ];
+            } else {
+                lines = [
+                    '剖面: ' + data.name,
+                    '点数: ' + data.total
+                ];
+            }
+            const maxWidth = Math.max(...lines.map(l => ctx.measureText(l).width)) + 20;
+            const boxHeight = lines.length * lineHeight + 16;
+            const boxWidth = maxWidth + 16;
+
+            ctx.save();
+            ctx.shadowColor = 'rgba(0,0,0,0.06)';
+            ctx.shadowBlur = 8;
+            ctx.fillStyle = 'rgba(255,255,255,0.88)';
+            ctx.shadowColor = 'rgba(0,0,0,0.08)';
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.roundRect(x, y, boxWidth, boxHeight, 8);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.roundRect(x, y, boxWidth, boxHeight, 8);
+            ctx.stroke();
+
+            ctx.fillStyle = '#1a2634';
+            ctx.font = fontSize + 'px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.textBaseline = 'top';
+            lines.forEach((text, i) => {
+                ctx.fillText(text, x + 8, y + 8 + i * lineHeight);
+            });
+            ctx.restore();
+        }
+
+        // ============================================================
+        //  网格
+        // ============================================================
+        function drawGrid() {
+            const topLeft = canvasToData(0, 0);
+            const botRight = canvasToData(canvasW, canvasH);
+            const xMin = topLeft.x,
+                xMax = botRight.x;
+            const yMin = topLeft.y,
+                yMax = botRight.y;
+
+            const xStep = 0.1;
+            const yStep = 0.1;
+
+            const xStart = Math.max(0, Math.floor(xMin / xStep) * xStep);
+            const xEnd = Math.min(1.0, Math.ceil(xMax / xStep) * xStep);
+            const yStart = Math.floor(yMin / yStep) * yStep;
+            const yEnd = Math.ceil(yMax / yStep) * yStep;
+
+            ctx.save();
+
+            // --- 水平线 (更醒目) ---
+            ctx.strokeStyle = 'rgba(0,0,0,0.20)';
+            ctx.lineWidth = 1.0;
+            for (let y = yStart; y <= yEnd + 1e-9; y += yStep) {
+                if (Math.abs(y) < 1e-9) continue;
+                const c = dataToCanvas(0, y);
+                if (c.y < MARGIN || c.y > canvasH - MARGIN) continue;
+                ctx.beginPath();
+                ctx.moveTo(MARGIN, c.y);
+                ctx.lineTo(canvasW - MARGIN, c.y);
+                ctx.stroke();
+                // 标签
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'right';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(y.toFixed(1), MARGIN - 4, c.y);
+            }
+
+            // --- 垂直线 ---
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = 0.8;
+            for (let x = xStart; x <= xEnd + 1e-9; x += xStep) {
+                if (Math.abs(x) < 1e-9) continue;
+                const c = dataToCanvas(x, 0);
+                if (c.x < MARGIN || c.x > canvasW - MARGIN) continue;
+                ctx.beginPath();
+                ctx.moveTo(c.x, MARGIN);
+                ctx.lineTo(c.x, canvasH - MARGIN);
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(0,0,0,0.45)';
+                ctx.font = '10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'top';
+                ctx.fillText(x.toFixed(1), c.x, canvasH - MARGIN + 3);
+            }
+
+            // --- 轴线 (0,0) ---
+            ctx.strokeStyle = 'rgba(0,0,0,0.25)';
+            ctx.lineWidth = 1.6;
+            const origin = dataToCanvas(0, 0);
+            if (origin.x >= MARGIN && origin.x <= canvasW - MARGIN) {
+                ctx.beginPath();
+                ctx.moveTo(origin.x, MARGIN);
+                ctx.lineTo(origin.x, canvasH - MARGIN);
+                ctx.stroke();
+            }
+            if (origin.y >= MARGIN && origin.y <= canvasH - MARGIN) {
+                ctx.beginPath();
+                ctx.moveTo(MARGIN, origin.y);
+                ctx.lineTo(canvasW - MARGIN, origin.y);
+                ctx.stroke();
+            }
+
+            // --- x=1.0 虚线 ---
+            const teLine = dataToCanvas(1.0, 0);
+            if (teLine.x >= MARGIN && teLine.x <= canvasW - MARGIN) {
+                ctx.strokeStyle = 'rgba(0,0,0,0.15)';
+                ctx.lineWidth = 0.8;
+                ctx.setLineDash([3, 4]);
+                ctx.beginPath();
+                ctx.moveTo(teLine.x, MARGIN);
+                ctx.lineTo(teLine.x, canvasH - MARGIN);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            ctx.restore();
+        }
+
+        // ============================================================
+        //  标签 (入口/出口) - 仅 LE
+        // ============================================================
+        function drawLabel(x, y, type, label) {
+            const c = dataToCanvas(x, y);
+            const pct = (x * 100).toFixed(2) + '%';
+            const txt = label + ' ' + pct;
+
+            const isInlet = type === 'inlet';
+            const color = isInlet ? '#c0392b' : '#2980b9';
+
+            const fontSize = 11;
+            ctx.save();
+            ctx.font = '600 ' + fontSize + 'px sans-serif';
+            const metrics = ctx.measureText(txt);
+            const tw = metrics.width;
+            const pad = 8;
+            const bw = tw + pad * 2;
+            const bh = fontSize + pad * 2 - 4;
+
+            const offsetY = isInlet ? -22 : 22;
+            const finalY = c.y + offsetY;
+            const rx = c.x - bw / 2;
+            const ry = finalY - bh / 2;
+
+            ctx.shadowColor = 'rgba(0,0,0,0.06)';
+            ctx.shadowBlur = 6;
+            ctx.fillStyle = 'rgba(255,255,255,0.92)';
+            ctx.beginPath();
+            ctx.roundRect(rx, ry, bw, bh, 8);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+
+            ctx.strokeStyle = 'rgba(0,0,0,0.08)';
+            ctx.lineWidth = 0.8;
+            ctx.beginPath();
+            ctx.roundRect(rx, ry, bw, bh, 8);
+            ctx.stroke();
+
+            ctx.fillStyle = color;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(txt, c.x, finalY + 1);
+
+            ctx.strokeStyle = 'rgba(0,0,0,0.12)';
+            ctx.lineWidth = 0.8;
+            ctx.setLineDash([2, 3]);
+            ctx.beginPath();
+            ctx.moveTo(c.x, c.y + (isInlet ? -6 : 6));
+            ctx.lineTo(c.x, finalY + (isInlet ? 8 : -8));
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.restore();
+        }
+
+        CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r) {
+            if (r > w / 2) r = w / 2;
+            if (r > h / 2) r = h / 2;
+            this.moveTo(x + r, y);
+            this.lineTo(x + w - r, y);
+            this.quadraticCurveTo(x + w, y, x + w, y + r);
+            this.lineTo(x + w, y + h - r);
+            this.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+            this.lineTo(x + r, y + h);
+            this.quadraticCurveTo(x, y + h, x, y + h - r);
+            this.lineTo(x, y + r);
+            this.quadraticCurveTo(x, y, x + r, y);
+            this.closePath();
+            return this;
+        };
+
+        // ============================================================
+        //  图例
+        // ============================================================
+        function updateLegend() {
+            const isLE = profileData && profileData.format === 'le';
+            legendContainer.innerHTML = '';
+            if (!profileData) {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = '<span style="color:#999;">未加载翼型</span>';
+                legendContainer.appendChild(item);
+                return;
+            }
+
+            if (isLE) {
+                const sections = [
+                    { key: 'extrados', label: '外弧', lineColor: lineColors.extrados, dotColor: pointColors.extrados },
+                    { key: 'inlet', label: '入口', lineColor: lineColors.inlet, dotColor: pointColors.inlet },
+                    { key: 'intrados', label: '内弧', lineColor: lineColors.intrados, dotColor: pointColors.intrados }
+                ];
+                for (const s of sections) {
+                    const item = document.createElement('div');
+                    item.className = 'legend-item';
+                    item.innerHTML = `
+                        <span class="swatch" style="background:${s.lineColor};"></span>
+                        <span>${s.label}</span>
+                        ${showPoints ? `<span class="dot-swatch" style="background:${s.dotColor};"></span>` : ''}
+                    `;
+                    legendContainer.appendChild(item);
+                }
+            } else {
+                const item = document.createElement('div');
+                item.className = 'legend-item';
+                item.innerHTML = `
+                    <span class="swatch" style="background:${lineColors.contour};"></span>
+                    <span>轮廓</span>
+                    ${showPoints ? `<span class="dot-swatch" style="background:${pointColors.contour};"></span>` : ''}
+                `;
+                legendContainer.appendChild(item);
+            }
+        }
+
+        // ============================================================
+        //  适应视图 (居中显示剖面)
+        // ============================================================
+        function fitView() {
+            if (!profileData || profileData.points.length === 0) {
+                draw();
+                return;
+            }
+
+            if (canvasW === 0 || canvasH === 0) {
+                updateCanvasSize();
+                if (canvasW === 0 || canvasH === 0) {
+                    setTimeout(fitView, 50);
+                    return;
+                }
+            }
+
+            const pts = profileData.points;
+            let minX = Infinity,
+                maxX = -Infinity,
+                minY = Infinity,
+                maxY = -Infinity;
+            for (const p of pts) {
+                if (p[0] < minX) minX = p[0];
+                if (p[0] > maxX) maxX = p[0];
+                if (p[1] < minY) minY = p[1];
+                if (p[1] > maxY) maxY = p[1];
+            }
+            const padX = (maxX - minX) * 0.03 || 0.02;
+            const padY = (maxY - minY) * 0.03 || 0.02;
+            minX -= padX;
+            maxX += padX;
+            minY -= padY;
+            maxY += padY;
+
+            const rangeX = maxX - minX;
+            const rangeY = maxY - minY;
+
+            const availW = canvasW - 2 * MARGIN;
+            const availH = canvasH - 2 * MARGIN;
+
+            const scaleX = availW / rangeX;
+            const scaleY = availH / rangeY;
+            const scale = Math.min(scaleX, scaleY);
+            view.scale = Math.min(Math.max(scale, 0.02), 5000);
+
+            const centerX = (minX + maxX) / 2;
+            const centerY = (minY + maxY) / 2;
+
+            view.offsetX = centerX - (canvasW / 2 - MARGIN) / view.scale;
+            view.offsetY = centerY + (canvasH / 2 - MARGIN) / view.scale;
+
+            draw();
+        }
+
+        // ============================================================
+        //  重置视图
+        // ============================================================
+        function resetView() {
+            fitView();
+        }
+
+        // ============================================================
+        //  解析 LE 格式 (txt)
+        // ============================================================
+        function parseLEFileContent(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+            if (lines.length < 6) {
+                alert('无效的 LE 格式: 行数不足。');
+                return null;
+            }
+            const name = lines[0].trim();
+            const total = parseInt(lines[1], 10);
+            const extradosCount = parseInt(lines[2], 10);
+            const inletCount = parseInt(lines[3], 10);
+            const intradosCount = parseInt(lines[4], 10);
+            if (isNaN(total) || isNaN(extradosCount) || isNaN(inletCount) || isNaN(intradosCount)) {
+                alert('无效的 LE 头: 第 2-5 行应为整数。');
+                return null;
+            }
+            const expectedTotal = extradosCount + inletCount + intradosCount - 2;
+            if (total !== expectedTotal) {
+                console.warn('LE total mismatch: header says', total, 'expected', expectedTotal);
+            }
+            const pts = [];
+            for (let i = 5; i < lines.length; i++) {
+                const parts = lines[i].trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const x = parseFloat(parts[0]);
+                const y = parseFloat(parts[1]);
+                if (!isNaN(x) && !isNaN(y)) {
+                    pts.push([x, y]);
+                }
+            }
+            if (pts.length !== total) {
+                console.warn('LE point count mismatch: header says', total, 'found', pts.length);
+            }
+            return {
+                format: 'le',
+                name: name,
+                total: pts.length,
+                extradosCount: extradosCount,
+                inletCount: inletCount,
+                intradosCount: intradosCount,
+                points: pts
+            };
+        }
+
+        // ============================================================
+        //  解析 DAT 格式
+        // ============================================================
+        function parseDATFileContent(text) {
+            const lines = text.split(/\r?\n/).filter(l => l.trim() !== '');
+            if (lines.length < 2) {
+                alert('无效的 DAT 格式: 需要名称和至少一对坐标。');
+                return null;
+            }
+            const name = lines[0].trim();
+            const pts = [];
+            for (let i = 1; i < lines.length; i++) {
+                const parts = lines[i].trim().split(/\s+/);
+                if (parts.length < 2) continue;
+                const x = parseFloat(parts[0]);
+                const y = parseFloat(parts[1]);
+                if (!isNaN(x) && !isNaN(y)) {
+                    pts.push([x, y]);
+                }
+            }
+            if (pts.length < 2) {
+                alert('DAT 文件必须包含至少 2 对坐标。');
+                return null;
+            }
+            return {
+                format: 'dat',
+                name: name,
+                total: pts.length,
+                points: pts
+            };
+        }
+
+        // ============================================================
+        //  加载剖面
+        // ============================================================
+        function loadProfile(data) {
+            if (!data) return;
+            profileData = data;
+
+            const isLE = (data.format === 'le');
+            const extradosGroup = document.getElementById('extradosLineColor').parentElement;
+            const inletGroup = document.getElementById('inletLineColor').parentElement;
+            const intradosGroup = document.getElementById('intradosLineColor').parentElement;
+            extradosGroup.style.display = isLE ? 'flex' : 'none';
+            inletGroup.style.display = isLE ? 'flex' : 'none';
+            intradosGroup.style.display = isLE ? 'flex' : 'none';
+
+            if (!isLE) {
+                lineColors.contour = lineColors.extrados;
+                pointColors.contour = pointColors.extrados;
+            }
+
+            if (canvasW === 0 || canvasH === 0) {
+                updateCanvasSize();
+            }
+
+            fitView();
+            updateLegend();
+        }
+
+        function loadFromFile(file, format) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                let data;
+                if (format === 'le') {
+                    data = parseLEFileContent(e.target.result);
+                } else {
+                    data = parseDATFileContent(e.target.result);
+                }
+                if (data) {
+                    loadProfile(data);
+                }
+            };
+            reader.onerror = function() {
+                alert('读取文件时出错。');
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        //  切换点显示
+        // ============================================================
+        function togglePoints() {
+            showPoints = !showPoints;
+            togglePointsBtn.textContent = showPoints ? '●' : '○';
+            togglePointsBtn.classList.toggle('active', showPoints);
+            draw();
+            updateLegend();
+        }
+
+        togglePointsBtn.addEventListener('click', togglePoints);
+
+        // ============================================================
+        //  颜色选择器
+        // ============================================================
+        extradosLinePicker.addEventListener('input', function() {
+            lineColors.extrados = this.value;
+            lineColors.contour = this.value;
+            draw();
+        });
+        inletLinePicker.addEventListener('input', function() {
+            lineColors.inlet = this.value;
+            draw();
+        });
+        intradosLinePicker.addEventListener('input', function() {
+            lineColors.intrados = this.value;
+            draw();
+        });
+        pointColorPicker.addEventListener('input', function() {
+            const c = this.value;
+            pointColors.extrados = c;
+            pointColors.inlet = c;
+            pointColors.intrados = c;
+            pointColors.contour = c;
+            draw();
+        });
+
+        // ============================================================
+        //  保存 PNG
+        // ============================================================
+        function saveCanvasAsPNG() {
+            const dpr = window.devicePixelRatio || 1;
+            const exportCanvas = document.createElement('canvas');
+            exportCanvas.width = canvas.width;
+            exportCanvas.height = canvas.height;
+            const expCtx = exportCanvas.getContext('2d');
+
+            expCtx.fillStyle = '#ffffff';
+            expCtx.fillRect(0, 0, exportCanvas.width, exportCanvas.height);
+
+            expCtx.scale(dpr, dpr);
+            expCtx.drawImage(canvas, 0, 0, canvasW, canvasH);
+
+            const legendItems = legendContainer.querySelectorAll('.legend-item');
+            if (legendItems.length > 0 && legendItems[0].textContent !== '未加载翼型') {
+                const itemHeight = 24;
+                const itemPadding = 8;
+                let maxTextWidth = 0;
+                expCtx.font = '13px sans-serif';
+                for (const item of legendItems) {
+                    const text = item.querySelector('span:nth-child(2)');
+                    if (text) {
+                        const m = expCtx.measureText(text.textContent);
+                        if (m.width > maxTextWidth) maxTextWidth = m.width;
+                    }
+                }
+                const boxW = maxTextWidth + 80;
+                const boxH = itemHeight * legendItems.length + itemPadding * 2;
+                const boxX = canvasW - boxW - 20;
+                const boxY = 20;
+                expCtx.save();
+                expCtx.shadowColor = 'rgba(0,0,0,0.06)';
+                expCtx.shadowBlur = 8;
+                expCtx.fillStyle = 'rgba(255,255,255,0.92)';
+                expCtx.shadowColor = 'rgba(0,0,0,0.08)';
+                expCtx.shadowBlur = 8;
+                expCtx.beginPath();
+                expCtx.roundRect(boxX, boxY, boxW, boxH, 8);
+                expCtx.fill();
+                expCtx.shadowBlur = 0;
+                expCtx.strokeStyle = 'rgba(0,0,0,0.08)';
+                expCtx.lineWidth = 0.8;
+                expCtx.beginPath();
+                expCtx.roundRect(boxX, boxY, boxW, boxH, 8);
+                expCtx.stroke();
+
+                const yOffset = boxY + itemPadding + 4;
+                legendItems.forEach((item, i) => {
+                    const yPos = yOffset + i * itemHeight;
+                    const swatch = item.querySelector('.swatch');
+                    const dot = item.querySelector('.dot-swatch');
+                    const label = item.querySelector('span:nth-child(2)');
+                    if (swatch) {
+                        expCtx.strokeStyle = swatch.style.background || '#000';
+                        expCtx.lineWidth = 3;
+                        expCtx.beginPath();
+                        expCtx.moveTo(boxX + 10, yPos + 6);
+                        expCtx.lineTo(boxX + 40, yPos + 6);
+                        expCtx.stroke();
+                    }
+                    if (dot) {
+                        expCtx.fillStyle = dot.style.background || '#000';
+                        expCtx.beginPath();
+                        expCtx.arc(boxX + 52, yPos + 6, 5, 0, Math.PI * 2);
+                        expCtx.fill();
+                        expCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+                        expCtx.lineWidth = 1;
+                        expCtx.stroke();
+                    }
+                    if (label) {
+                        expCtx.fillStyle = '#1a2634';
+                        expCtx.font = '13px sans-serif';
+                        expCtx.textAlign = 'left';
+                        expCtx.textBaseline = 'middle';
+                        expCtx.fillText(label.textContent, boxX + 62, yPos + 6);
+                    }
+                });
+                expCtx.restore();
+            }
+
+            const link = document.createElement('a');
+            link.download = (profileData ? profileData.name : 'airfoil') + '.png';
+            link.href = exportCanvas.toDataURL('image/png');
+            link.click();
+        }
+
+        savePngBtn.addEventListener('click', saveCanvasAsPNG);
+
+        // ============================================================
+        //  鼠标 / 触摸
+        // ============================================================
+        function getCanvasCoords(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.clientX || (e.touches && e.touches[0].clientX);
+            const clientY = e.clientY || (e.touches && e.touches[0].clientY);
+            if (clientX == null) return null;
+            const scaleX = canvasW / rect.width;
+            const scaleY = canvasH / rect.height;
+            return {
+                x: (clientX - rect.left) * scaleX,
+                y: (clientY - rect.top) * scaleY
+            };
+        }
+
+        canvas.addEventListener('wheel', function(e) {
+            e.preventDefault();
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            const scaleX = canvasW / rect.width;
+            const scaleY = canvasH / rect.height;
+            const cx = mx * scaleX;
+            const cy = my * scaleY;
+
+            const delta = e.deltaY > 0 ? 0.88 : 1 / 0.88;
+            const newScale = Math.min(Math.max(view.scale * delta, 0.02), 5000);
+
+            const dataPt = canvasToData(cx, cy);
+            view.scale = newScale;
+            const newCanvas = dataToCanvas(dataPt.x, dataPt.y);
+            view.offsetX += (cx - newCanvas.x) / view.scale;
+            view.offsetY -= (cy - newCanvas.y) / view.scale;
+
+            draw();
+        }, { passive: false });
+
+        canvas.addEventListener('mousedown', function(e) {
+            isDragging = true;
+            const pos = getCanvasCoords(e);
+            if (pos) {
+                dragStart.x = pos.x;
+                dragStart.y = pos.y;
+                viewStart.x = view.offsetX;
+                viewStart.y = view.offsetY;
+                canvas.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mousemove', function(e) {
+            if (!isDragging) {
+                const pos = getCanvasCoords(e);
+                if (pos) {
+                    const d = canvasToData(pos.x, pos.y);
+                    mouseCoordsEl.textContent = 'x: ' + d.x.toFixed(4) + '  y: ' + d.y.toFixed(4);
+                }
+                return;
+            }
+            const pos = getCanvasCoords(e);
+            if (!pos) return;
+            const dx = (pos.x - dragStart.x) / view.scale;
+            const dy = (pos.y - dragStart.y) / view.scale;
+            view.offsetX = viewStart.x - dx;
+            view.offsetY = viewStart.y + dy;
+            draw();
+        });
+
+        window.addEventListener('mouseup', function() {
+            if (isDragging) {
+                isDragging = false;
+                canvas.style.cursor = 'grab';
+            }
+        });
+
+        let touchStart = null;
+        let touchStartView = null;
+        let lastTouchDist = 0;
+
+        canvas.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            const touches = e.touches;
+            if (touches.length === 1) {
+                const pos = getCanvasCoords(touches[0]);
+                if (pos) {
+                    touchStart = { x: pos.x, y: pos.y };
+                    touchStartView = { x: view.offsetX, y: view.offsetY };
+                }
+            } else if (touches.length === 2) {
+                const dx = touches[0].clientX - touches[1].clientX;
+                const dy = touches[0].clientY - touches[1].clientY;
+                lastTouchDist = Math.sqrt(dx * dx + dy * dy);
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchmove', function(e) {
+            e.preventDefault();
+            const touches = e.touches;
+            if (touches.length === 1 && touchStart) {
+                const pos = getCanvasCoords(touches[0]);
+                if (!pos) return;
+                const dx = (pos.x - touchStart.x) / view.scale;
+                const dy = (pos.y - touchStart.y) / view.scale;
+                view.offsetX = touchStartView.x - dx;
+                view.offsetY = touchStartView.y + dy;
+                draw();
+            } else if (touches.length === 2) {
+                const dx = touches[0].clientX - touches[1].clientX;
+                const dy = touches[0].clientY - touches[1].clientY;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (lastTouchDist > 0) {
+                    const delta = dist / lastTouchDist;
+                    const newScale = Math.min(Math.max(view.scale * delta, 0.02), 5000);
+                    view.scale = newScale;
+                    lastTouchDist = dist;
+                    draw();
+                } else {
+                    lastTouchDist = dist;
+                }
+            }
+        }, { passive: false });
+
+        canvas.addEventListener('touchend', function() {
+            touchStart = null;
+            touchStartView = null;
+            lastTouchDist = 0;
+        });
+
+        // ============================================================
+        //  UI 事件
+        // ============================================================
+        fileInputLE.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                loadFromFile(this.files[0], 'le');
+            }
+            this.value = '';
+        });
+
+        fileInputDAT.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                loadFromFile(this.files[0], 'dat');
+            }
+            this.value = '';
+        });
+
+        fitBtn.addEventListener('click', fitView);
+        resetViewBtn.addEventListener('click', resetView);
+
+        gridToggle.addEventListener('change', function() {
+            showGrid = this.checked;
+            draw();
+        });
+
+        // ============================================================
+        //  拖放
+        // ============================================================
+        wrap.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#3498db';
+        });
+        wrap.addEventListener('dragleave', function(e) {
+            this.style.borderColor = '#e2e8f0';
+        });
+        wrap.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.borderColor = '#e2e8f0';
+            const files = e.dataTransfer.files;
+            if (files && files.length > 0) {
+                const file = files[0];
+                const name = file.name.toLowerCase();
+                if (name.endsWith('.txt')) {
+                    loadFromFile(file, 'le');
+                } else if (name.endsWith('.dat')) {
+                    loadFromFile(file, 'dat');
+                } else {
+                    alert('请拖放 .txt 或 .dat 文件。');
+                }
+            }
+        });
+
+        // ============================================================
+        //  窗口调整
+        // ============================================================
+        let resizeTimeout = null;
+        window.addEventListener('resize', function() {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                updateCanvasSize();
+                if (profileData) {
+                    fitView();
+                } else {
+                    draw();
+                }
+            }, 200);
+        });
+
+        // ============================================================
+        //  初始化
+        // ============================================================
+        function init() {
+            updateCanvasSize();
+
+            document.getElementById('extradosLineColor').parentElement.style.display = 'flex';
+            document.getElementById('inletLineColor').parentElement.style.display = 'flex';
+            document.getElementById('intradosLineColor').parentElement.style.display = 'flex';
+
+            extradosLinePicker.value = lineColors.extrados;
+            inletLinePicker.value = lineColors.inlet;
+            intradosLinePicker.value = lineColors.intrados;
+            pointColorPicker.value = pointColors.extrados;
+
+            canvas.style.cursor = 'grab';
+
+            togglePointsBtn.textContent = '●';
+            togglePointsBtn.classList.add('active');
+
+            loadProfile(GNU_A_DATA);
+        }
+
+        init();
+    </script>
+</body>
+</html>

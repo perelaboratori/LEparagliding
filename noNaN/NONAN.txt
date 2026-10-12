@@ -1,0 +1,231 @@
+      SUBROUTINE NONAN(FILENAME)
+C     Replace all NaN (Not a Number) by 0.0 in a Fortran generated DXF file
+C     Improved version without GOTO statements
+      
+      CHARACTER*(*) FILENAME
+      CHARACTER*512 LINE, TEMPFILE
+      CHARACTER*3 NAN_STR
+      CHARACTER*3 REP_STR
+      INTEGER I, J, L, IOS, FILE_LEN
+      LOGICAL FILE_EXISTS, EOF_REACHED
+      
+      PARAMETER (NAN_STR = 'NaN')
+      PARAMETER (REP_STR = '0.0')
+      
+C     Check if file exists
+      INQUIRE(FILE=FILENAME, EXIST=FILE_EXISTS)
+      IF (.NOT. FILE_EXISTS) THEN
+          WRITE(*,1000) 'File does not exist: ', FILENAME
+          RETURN
+      ENDIF
+      
+      FILE_LEN = LEN_TRIM(FILENAME)
+      
+C     Create a unique temporary filename
+      TEMPFILE = FILENAME(1:FILE_LEN) // '.tmp_nonan'
+      CALL GET_UNIQUE_FILENAME(TEMPFILE)
+      
+C     Open and process files
+      IF (PROCESS_FILE(FILENAME, TEMPFILE)) THEN
+C         Successful processing - copy back and clean up
+          IF (COPY_FILE(TEMPFILE, FILENAME)) THEN
+              CALL DELETE_FILE(TEMPFILE)
+              WRITE(*,1000) 'Successfully processed file: ', 
+     &                      FILENAME(1:FILE_LEN)
+          ELSE
+              WRITE(*,1000) 'Error copying file: ', TEMPFILE
+          ENDIF
+      ELSE
+          WRITE(*,1000) 'Error processing file: ', FILENAME
+      ENDIF
+      
+ 1000 FORMAT(A,A)
+      
+      END
+      
+      LOGICAL FUNCTION PROCESS_FILE(INFILE, OUTFILE)
+C     Process input file to replace NaN with 0.0
+      
+      CHARACTER*(*) INFILE, OUTFILE
+      CHARACTER*512 LINE
+      CHARACTER*3 NAN_STR, REP_STR
+      INTEGER UNIT_IN, UNIT_OUT, IOS, L, I, J
+      LOGICAL EOF_REACHED, FOUND_NAN, SUCCESS
+      
+      PARAMETER (UNIT_IN = 10)
+      PARAMETER (UNIT_OUT = 11)
+      PARAMETER (NAN_STR = 'NaN')
+      PARAMETER (REP_STR = '0.0')
+      
+      PROCESS_FILE = .FALSE.
+      SUCCESS = .TRUE.
+      
+C     Open input file
+      OPEN(UNIT=UNIT_IN, FILE=INFILE, STATUS='OLD',
+     &     ACCESS='SEQUENTIAL', FORM='FORMATTED',
+     &     IOSTAT=IOS)
+      IF (IOS .NE. 0) THEN
+          WRITE(*,*) 'Error opening input file: ', INFILE
+          RETURN
+      ENDIF
+      
+C     Open output file
+      OPEN(UNIT=UNIT_OUT, FILE=OUTFILE, STATUS='NEW',
+     &     ACCESS='SEQUENTIAL', FORM='FORMATTED',
+     &     IOSTAT=IOS)
+      IF (IOS .NE. 0) THEN
+          WRITE(*,*) 'Error creating output file: ', OUTFILE
+          CLOSE(UNIT_IN)
+          RETURN
+      ENDIF
+      
+C     Process each line
+      EOF_REACHED = .FALSE.
+      DO WHILE (.NOT. EOF_REACHED .AND. SUCCESS)
+          READ(UNIT_IN, '(A)', IOSTAT=IOS) LINE
+          
+          IF (IOS .LT. 0) THEN
+              EOF_REACHED = .TRUE.
+          ELSE IF (IOS .GT. 0) THEN
+              SUCCESS = .FALSE.
+              WRITE(*,*) 'Error reading file: ', INFILE
+          ELSE
+C             Process the line
+              L = LEN_TRIM(LINE)
+              I = 1
+              J = 1
+              FOUND_NAN = .FALSE.
+              
+C             Scan for NaN occurrences
+              DO WHILE (I .LE. L-2)
+                  IF (LINE(I:I+2) .EQ. NAN_STR) THEN
+                      IF (J .LT. I) THEN
+                          WRITE(UNIT_OUT, '(A)', ADVANCE='NO') 
+     &                          LINE(J:I-1)
+                      ENDIF
+                      WRITE(UNIT_OUT, '(A)', ADVANCE='NO') REP_STR
+                      I = I + 3
+                      J = I
+                      FOUND_NAN = .TRUE.
+                  ELSE
+                      I = I + 1
+                  ENDIF
+              END DO
+              
+C             Write the rest of the line
+              IF (J .LE. L) THEN
+                  IF (FOUND_NAN .OR. J .GT. 1) THEN
+                      WRITE(UNIT_OUT, '(A)') LINE(J:L)
+                  ELSE
+                      WRITE(UNIT_OUT, '(A)') LINE(1:L)
+                  ENDIF
+              ELSE
+                  WRITE(UNIT_OUT, *) ''
+              ENDIF
+          ENDIF
+      END DO
+      
+C     Close files
+      CLOSE(UNIT_IN)
+      CLOSE(UNIT_OUT)
+      
+      IF (SUCCESS) PROCESS_FILE = .TRUE.
+      
+      END
+      
+      LOGICAL FUNCTION COPY_FILE(SOURCE, DEST)
+C     Copy file from SOURCE to DEST
+      
+      CHARACTER*(*) SOURCE, DEST
+      CHARACTER*512 LINE
+      INTEGER UNIT_SRC, UNIT_DST, IOS
+      LOGICAL EOF_REACHED, SUCCESS
+      
+      PARAMETER (UNIT_SRC = 20)
+      PARAMETER (UNIT_DST = 21)
+      
+      COPY_FILE = .FALSE.
+      SUCCESS = .TRUE.
+      
+C     Open source file
+      OPEN(UNIT=UNIT_SRC, FILE=SOURCE, STATUS='OLD',
+     &     ACCESS='SEQUENTIAL', FORM='FORMATTED',
+     &     IOSTAT=IOS)
+      IF (IOS .NE. 0) THEN
+          WRITE(*,*) 'Error opening source: ', SOURCE
+          RETURN
+      ENDIF
+      
+C     Open destination file
+      OPEN(UNIT=UNIT_DST, FILE=DEST, STATUS='REPLACE',
+     &     ACCESS='SEQUENTIAL', FORM='FORMATTED',
+     &     IOSTAT=IOS)
+      IF (IOS .NE. 0) THEN
+          WRITE(*,*) 'Error opening destination: ', DEST
+          CLOSE(UNIT_SRC)
+          RETURN
+      ENDIF
+      
+C     Copy lines
+      EOF_REACHED = .FALSE.
+      DO WHILE (.NOT. EOF_REACHED .AND. SUCCESS)
+          READ(UNIT_SRC, '(A)', IOSTAT=IOS) LINE
+          
+          IF (IOS .LT. 0) THEN
+              EOF_REACHED = .TRUE.
+          ELSE IF (IOS .GT. 0) THEN
+              SUCCESS = .FALSE.
+              WRITE(*,*) 'Error reading during copy: ', SOURCE
+          ELSE
+              WRITE(UNIT_DST, '(A)') TRIM(LINE)
+          ENDIF
+      END DO
+      
+C     Close files
+      CLOSE(UNIT_SRC)
+      CLOSE(UNIT_DST)
+      
+      IF (SUCCESS) COPY_FILE = .TRUE.
+      
+      END
+      
+      SUBROUTINE GET_UNIQUE_FILENAME(FILENAME)
+C     Ensure FILENAME is unique by appending numbers if needed
+      
+      CHARACTER*(*) FILENAME
+      CHARACTER*512 TEMPNAME
+      INTEGER COUNTER
+      LOGICAL EXISTS
+      
+      COUNTER = 0
+      TEMPNAME = FILENAME
+      
+      INQUIRE(FILE=TEMPNAME, EXIST=EXISTS)
+      DO WHILE (EXISTS .AND. COUNTER .LT. 999)
+          COUNTER = COUNTER + 1
+          WRITE(TEMPNAME, '(A,I3.3)') 
+     &          FILENAME(1:LEN_TRIM(FILENAME))//'_', COUNTER
+          INQUIRE(FILE=TEMPNAME, EXIST=EXISTS)
+      END DO
+      
+      IF (COUNTER .GE. 999) THEN
+          WRITE(*,*) 'Warning: Could not find unique filename for ',
+     &               FILENAME
+      ELSE IF (COUNTER .GT. 0) THEN
+          FILENAME = TEMPNAME
+      ENDIF
+      
+      END
+      
+      SUBROUTINE DELETE_FILE(FILENAME)
+C     Delete a file if it exists
+      
+      CHARACTER*(*) FILENAME
+      INTEGER UNIT_DEL, IOS
+      
+      OPEN(UNIT=UNIT_DEL, FILE=FILENAME, STATUS='OLD', IOSTAT=IOS)
+      IF (IOS .EQ. 0) THEN
+          CLOSE(UNIT_DEL, STATUS='DELETE')
+      ENDIF
+      
+      END

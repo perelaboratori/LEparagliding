@@ -1,0 +1,48 @@
+AIRFOIL CONVERTER MANUAL
+Version 2015-02-08
+Update  2025-02-28  (Pi400/Pi4 version)
+
+- Put your standard airfoil.dat file in the working directory (you must use exactly these name airfoil.dat)
+- Edit acdata.txt to select inlets position %, and airfoil thickness amplification factor
+- Run ./a.out executable in Linux (or a.exe in Windows)
+- Read output file airfoil.txt and verify result matches your objective
+- rename airfoil.txt file acording these especified in leparagliding.txt data file.
+- Verify inlets positions in leparagliding.txt file (SECTION 2, columns 3 and 4) matches exactly with the defined airfoil(s). (*)
+
+File acdata.txt structure:
+
+real	integer
+real	integer
+real
+
+Example:
+
+1.6	-1
+6.3	-1
+1.0
+
+Explanation:
+
+Line 1 column 1: real (0 to 100 is % of chord inlet in)
+Line 1 column 2: boolean (-1,0,+1) -1 denotes point below chord, 0 point in chord, and +1 point over chord
+
+Line 2 column 1: real (0 to 100 is % of chord inlet out)
+Line 2 column 2: boolean (-1,0,+1) -1 denotes point below chord, 0 point in chord, and +1 point over chord
+
+Line 3: real thickness amplification (1.0 is most habitual; use 0.0 for wing tip)
+
+Program generates also airfoil.dxf file for viewing in CAD.
+
+Run:
+
+Windows64:
+
+ac-win64.exe (double click)
+
+Linux64: ./ac-lin64.out
+
+Linux arm64 (Pi400): ./ac-Pi400-arm.out
+
+
+(*) Coming soon is expected to integrate this small program within leparagliding, so the definition of the position of inlets is done automatically, just by reading Section 2.
+
