@@ -12,6 +12,38 @@ au/ some auxiliar apps
 Version 3.29  (2026-08)-19
 ------------------------------------------------------------------
 
+Fixed the error detected by Paweł in the wash-in calculation. Many thanks!!! This is a rookie mistake..., typical of programming with natural "intelligence"... :-) 
+The code uses the wingtip chord value before it has been calculated within the loop, defaulting to 0.0.
+The result is a smoother progression of wash-in angles, except at the last rib, where there is a slight jump. A
+ll paragliders calculated with automatic wash-in have been computed using this error for years...! Cases 1 and 2. 
+However, this error is not critical to the final result and may even have been beneficial in some instances. 
+The wash-in angle creates a distortion that, in principle, reduces aerodynamic efficiency unless rotations around the Z-axis are performed. 
+For the sake of compatibility, we will retain this wash-in calculation feature corresponding to parameter cases 1 and 2. 
+Parameter 0 corresponds to manual wash-in input. 
+We are also creating a new case—parameter 3—that calculates wash-in in exact proportion to the chord (which was the original intention).
+
+Parameter case 0 > Set manual washin
+
+Parameter case 1 > Washin partially proportional to chord (more accurate if wingtip chord is small)
+
+Parameter case 2 > Washin partially proportional to chord (more accurate if wingtip chord is small)
+
+Parameter case 3 > Washin proportional to chord (NEW CASE added 2026-10-12)
+
+Example for Swoop; we need to enter the case "3" as:
+
+--------------------------------------------------------
+
+* Alpha wingtip, parameter, (alpha center) 
+    5.0        3         0.0
+
+--------------------------------------------------------
+
+
+------------------------------------------------------------------
+Version 3.29  (2026-08)-19
+------------------------------------------------------------------
+
 New data section 38 HVR HOLES. Adds multiple holes in miriribs (now named type 9), full diagonal ribs (types 5/15), generic V-rib (types 6/16)
 
 New data section 39 HVR POSITION PARAMETERS. Use for better horizontal anb vertical HRV ribs in drawing boxex
