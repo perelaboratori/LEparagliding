@@ -1,0 +1,124 @@
+ LEparagliding
+ List of lines, human readable format
+ Ready also to import in .ods or .xls formats
+
+ Line number - Label - Lenght (cm) - Type
+
+
+ Plan A
+
+  1   1A1     47.0 cm  -  type  1 Riser             5.00 mm
+  2   2A1    414.9 cm  -  type  2 Line275           1.90 mm
+  3   2A2    398.9 cm  -  type  2 Line275           1.90 mm
+  4   2A3    374.9 cm  -  type  2 Line275           1.90 mm
+  5   3A1    193.9 cm  -  type  3 Line160           1.40 mm
+  6   3A2    193.9 cm  -  type  3 Line160           1.40 mm
+  7   3A3    193.9 cm  -  type  3 Line160           1.40 mm
+  8   3A4    193.9 cm  -  type  3 Line160           1.40 mm
+  9   3A5    194.0 cm  -  type  3 Line160           1.40 mm
+ 10   3A6    194.0 cm  -  type  3 Line160           1.40 mm
+ 11   4A3     90.7 cm  -  type  4 Line120           1.15 mm
+ 12   4A4     86.8 cm  -  type  4 Line120           1.15 mm
+ 13   4A7     82.4 cm  -  type  4 Line120           1.15 mm
+ 14   4A8     83.3 cm  -  type  4 Line120           1.15 mm
+ 15   4A12    90.9 cm  -  type  4 Line120           1.15 mm
+ 16   4A13    86.7 cm  -  type  4 Line120           1.15 mm
+ 17   4A16    79.9 cm  -  type  4 Line120           1.15 mm
+ 18   4A17    79.5 cm  -  type  4 Line120           1.15 mm
+ 19   4A20    94.8 cm  -  type  4 Line120           1.15 mm
+ 20   4A22    85.9 cm  -  type  4 Line120           1.15 mm
+ 21   4A24    78.9 cm  -  type  4 Line120           1.15 mm
+ 22   4A26    75.5 cm  -  type  4 Line120           1.15 mm
+
+ Plan B
+
+ 23   1B1     47.0 cm  -  type  1 Riser             5.00 mm
+ 24   2B1    406.9 cm  -  type  2 Line275           1.90 mm
+ 25   2B2    391.9 cm  -  type  2 Line275           1.90 mm
+ 26   2B3    370.9 cm  -  type  2 Line275           1.90 mm
+ 27   3B1    193.9 cm  -  type  3 Line160           1.40 mm
+ 28   3B2    193.9 cm  -  type  3 Line160           1.40 mm
+ 29   3B3    193.9 cm  -  type  3 Line160           1.40 mm
+ 30   3B4    193.9 cm  -  type  3 Line160           1.40 mm
+ 31   3B5    194.0 cm  -  type  3 Line160           1.40 mm
+ 32   3B6    194.0 cm  -  type  3 Line160           1.40 mm
+ 33   4B3     89.7 cm  -  type  4 Line120           1.15 mm
+ 34   4B4     85.9 cm  -  type  4 Line120           1.15 mm
+ 35   4B7     81.8 cm  -  type  4 Line120           1.15 mm
+ 36   4B8     82.8 cm  -  type  4 Line120           1.15 mm
+ 37   4B12    90.2 cm  -  type  4 Line120           1.15 mm
+ 38   4B13    86.4 cm  -  type  4 Line120           1.15 mm
+ 39   4B16    80.4 cm  -  type  4 Line120           1.15 mm
+ 40   4B17    80.2 cm  -  type  4 Line120           1.15 mm
+ 41   4B20    93.5 cm  -  type  4 Line120           1.15 mm
+ 42   4B22    85.8 cm  -  type  4 Line120           1.15 mm
+ 43   4B24    79.6 cm  -  type  4 Line120           1.15 mm
+ 44   4B26    76.7 cm  -  type  4 Line120           1.15 mm
+
+ Plan C
+
+ 45   1C1     47.0 cm  -  type  1 Riser             5.00 mm
+ 46   2C1    422.9 cm  -  type  2 Line275           1.90 mm
+ 47   2C2    406.0 cm  -  type  2 Line275           1.90 mm
+ 48   2C3    381.0 cm  -  type  2 Line275           1.90 mm
+ 49   2C4    444.0 cm  -  type  2 Line275           1.90 mm
+ 50   3C1    194.0 cm  -  type  3 Line160           1.40 mm
+ 51   3C2    194.0 cm  -  type  3 Line160           1.40 mm
+ 52   3C3    194.0 cm  -  type  3 Line160           1.40 mm
+ 53   3C4    194.0 cm  -  type  3 Line160           1.40 mm
+ 54   3C5    194.0 cm  -  type  3 Line160           1.40 mm
+ 55   3C6    194.0 cm  -  type  3 Line160           1.40 mm
+ 56   3A29   182.8 cm  -  type  3 Line160           1.40 mm
+ 57   3A31   176.5 cm  -  type  3 Line160           1.40 mm
+ 58   3B29   180.8 cm  -  type  3 Line160           1.40 mm
+ 59   3B31   178.6 cm  -  type  3 Line160           1.40 mm
+ 60   3C29   189.3 cm  -  type  3 Line160           1.40 mm
+ 61   3C31   183.6 cm  -  type  3 Line160           1.40 mm
+ 62   4C3     90.6 cm  -  type  4 Line120           1.15 mm
+ 63   4C4     86.6 cm  -  type  4 Line120           1.15 mm
+ 64   4C7     81.8 cm  -  type  4 Line120           1.15 mm
+ 65   4C8     82.6 cm  -  type  4 Line120           1.15 mm
+ 66   4C12    90.6 cm  -  type  4 Line120           1.15 mm
+ 67   4C13    86.4 cm  -  type  4 Line120           1.15 mm
+ 68   4C16    79.2 cm  -  type  4 Line120           1.15 mm
+ 69   4C17    78.7 cm  -  type  4 Line120           1.15 mm
+ 70   4C20    94.4 cm  -  type  4 Line120           1.15 mm
+ 71   4C22    85.6 cm  -  type  4 Line120           1.15 mm
+ 72   4C24    78.2 cm  -  type  4 Line120           1.15 mm
+ 73   4C26    74.0 cm  -  type  4 Line120           1.15 mm
+
+ Brake lines
+
+ 74   1F1    298.0 cm  -  type  6 Line200B          2.00 mm
+ 75   2F1    237.0 cm  -  type  2 Line275           1.90 mm
+ 76   2F2    190.0 cm  -  type  2 Line275           1.90 mm
+ 77   2F3    173.0 cm  -  type  2 Line275           1.90 mm
+ 78   3F1    119.0 cm  -  type  3 Line160           1.40 mm
+ 79   3F2    119.0 cm  -  type  3 Line160           1.40 mm
+ 80   3F3    119.0 cm  -  type  3 Line160           1.40 mm
+ 81   3F4    119.0 cm  -  type  3 Line160           1.40 mm
+ 82   3F5    119.0 cm  -  type  3 Line160           1.40 mm
+ 83   3F6    119.0 cm  -  type  3 Line160           1.40 mm
+ 84   4F3    122.9 cm  -  type  4 Line120           1.15 mm
+ 85   4F6     96.3 cm  -  type  4 Line120           1.15 mm
+ 86   4F9     77.3 cm  -  type  4 Line120           1.15 mm
+ 87   4F11    74.6 cm  -  type  4 Line120           1.15 mm
+ 88   4F14   102.6 cm  -  type  4 Line120           1.15 mm
+ 89   4F16    91.3 cm  -  type  4 Line120           1.15 mm
+ 90   4F19    82.2 cm  -  type  4 Line120           1.15 mm
+ 91   4F21    83.2 cm  -  type  4 Line120           1.15 mm
+ 92   4F24    90.5 cm  -  type  4 Line120           1.15 mm
+ 93   4F26    85.1 cm  -  type  4 Line120           1.15 mm
+ 94   4F28    80.9 cm  -  type  4 Line120           1.15 mm
+ 95   4F30    80.6 cm  -  type  4 Line120           1.15 mm
+
+Total line lengths (without loops) =    286.23 m
+Total line lengths (with loops) =    324.15 m
+ (loops lengths according section 34 or internal predefined values)
+
+ Minimal lengths by types, including loops:
+Type   1    4.26 m Riser           u_dyneem          5.00 mm loop  12.00 cm
+Type   2   98.49 m Line275         s_dyneem          1.90 mm loop  12.00 cm
+Type   3  117.94 m Line160         s_dyneem          1.40 mm loop  10.00 cm
+Type   4  101.29 m Line120         s_dyneem          1.15 mm loop  10.00 cm
+Type   6    6.44 m Line200B        s_dynemm          2.00 mm loop  12.00 cm

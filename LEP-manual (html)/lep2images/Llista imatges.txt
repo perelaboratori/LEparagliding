@@ -1,0 +1,131 @@
+Aquí teniu la llista de tots els enllaços a imatges que apareixen al manual, incloent tant les versions principals (href) com les que es mostren sense enllaç (src). He recollit tots els URL únics que apunten a fitxers d’imatge (.jpg, .png, .jpeg) presents a l’HTML.
+
+    lep2images/S01_leparagliding.jpg
+
+    lep2images/S02_airfoil.jpg
+
+    lep2images/S01_washin.jpg
+
+    lep2images/S01_Definition.jpg
+
+    lep2images/S02_minicab-minirib.jpg
+
+    lep2images/S01_rotated_triangles.jpg
+
+    lep2images/S02_delta_displacement.jpg
+
+    lep2images/S04_Hole1.jpg
+
+    lep2images/S04_Hole2.jpg
+
+    lep2images/S04_Hole3.jpg
+
+    lep2images/S05_skin_tension.jpg
+
+    lep2images/S05_Ripstop_elasticity.jpg
+
+    lep2images/S05_Sewing_adjustement.jpg
+
+    lep2images/S08_calage.jpg
+
+    lep2images/S09_lines_matrix_definition.jpg
+
+    lep2images/S10_Brake_distribution.jpg
+
+    lep2images/S11_raml.jpg
+
+    lep2images/S12_Minirib1.jpg
+
+    lep2images/S12_Minirib2.jpg
+
+    lep2images/S12_Minirib3.jpg
+
+    lep2images/S12_Minirib4.jpg
+
+    lep2images/S12_VRF-p.jpg
+
+    lep2images/S12_VRF-e.jpg
+
+    lep2images/S12_V-ribtype6.jpg
+
+    lep2images/S15_Extrados_colors.jpg
+
+    lep2images/S20.jpg
+
+    lep2images/S21.jpg
+
+    lep2images/S22.jpg
+
+    lep2images/S23.jpg
+
+    lep2images/S26.jpg
+
+    lep2images/S26_vents_types.jpg
+
+    lep2images/S27.jpg
+
+    lep2images/S28a.jpg
+
+    lep2images/S28b.jpg
+
+    lep2images/S28c.png
+
+    lep2images/S29_3D-shaping1.jpg
+
+    lep2images/S01_leparagliding.png (imatge mostrada sense enllaç)
+
+    lep2images/S05_skintension_.jpg
+
+    lep2images/S20-romanop-position.png
+
+    lep2images/S21-jtype2.jpeg
+
+    lep2images/S21.t3.jpg
+
+    lep2images/S21_sn_type3.png (sense enllaç)
+
+    lep2images/S21_rods%20type%201-4-5.png (sense enllaç)
+
+    lep2images/S26_c.jpg (sense enllaç)
+
+    lep2images/external/In5.png
+
+    lep2images/external/In6.png
+
+    lep2images/external/In7.png
+
+    lep2images/external/In8.png
+
+    lep2images/external/In9.png
+
+    lep2images/external/In10.png
+
+    lep2images/external/In11.png
+
+    lep2images/external/In12.png
+
+    lep2images/external/In15.png
+
+    lep2images/external/In16.png
+
+    lep2images/S32.png
+
+    lep2images/S37_2006_airfoil%20points.png (sense enllaç)
+
+    lep2images/S37_2006_rib-points.png (sense enllaç)
+
+    lep2images/S37%20Minirib%20transitions.jpg (sense enllaç)
+
+    leparagliding/lep2images/S37_3002_rombs.png (sense enllaç)
+
+    leparagliding/lep2images/S37_3002_potato.png (sense enllaç)
+
+    lep2images/S37_3002_ellipses.png (sense enllaç)
+
+    lep2images/S38_1_16h.png (sense enllaç)
+
+    lep2images/S38_2_type-15-holes.png (sense enllaç)
+
+    lep2images/S38_3_miniribs-holes.png (sense enllaç)
+
+Tots els enllaços de l’índex de figures (1–36) són versions grans. La resta són imatges addicionals que apareixen al cos del manual, ja sigui com a enllaços (href) o com a font directa (src) quan no tenen enllaç associat.
