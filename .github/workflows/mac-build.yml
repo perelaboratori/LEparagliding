@@ -37,9 +37,12 @@ jobs:
 
       - name: Package
         run: |
+          # Only the programs built on this machine (the repository also holds the finished
+          # programs for the other chip).
+          ARCH=$(uname -m)
           mkdir dist
-          cp lep/lep-*-mac-*.out pre/pre-*-mac-*.out "au/ac (fortran version)"/ac-mac-*.out dist/
-          tar -czf "lep-mac-$(uname -m).tar.gz" -C dist .
+          cp lep/lep-*-mac-"$ARCH".out pre/pre-*-mac-"$ARCH".out "au/ac (fortran version)/ac-mac-$ARCH.out" dist/
+          tar -czf "lep-mac-$ARCH.tar.gz" -C dist .
 
       - uses: actions/upload-artifact@v4
         with:

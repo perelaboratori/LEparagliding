@@ -18,6 +18,23 @@ Please include: your Mac (Apple menu > About This Mac: the chip or processor, an
 macOS version), what you typed, the exact message shown in Terminal (copy and paste it),
 and the file run-log.txt if the program wrote one.
 
+Ready-made programs (nothing to build)
+--------------------------------------
+The finished Mac programs are in this repository, next to the Linux and Windows ones:
+
+    lep/lep-3.29.1-mac-arm64.out      pre/pre-1.6-mac-arm64.out      au/ac (fortran version)/ac-mac-arm64.out
+    lep/lep-3.29.1-mac-x86_64.out     pre/pre-1.6-mac-x86_64.out     au/ac (fortran version)/ac-mac-x86_64.out
+
+arm64 = a Mac with an Apple M chip, x86_64 = an Intel Mac (Apple menu > About This Mac).
+They were built by GitHub's automatic build from the sources in this repository.
+They are not signed by Apple, so after downloading, macOS may refuse to open them. Once, in
+Terminal, in the folder with the program:
+
+    xattr -d com.apple.quarantine lep-3.29.1-mac-arm64.out
+    chmod +x lep-3.29.1-mac-arm64.out
+
+Then run it as described under "Run" below. To build the programs yourself, read on.
+
 Build on your Mac
 -----------------
 1. Install gfortran (once). With Homebrew (https://brew.sh):
