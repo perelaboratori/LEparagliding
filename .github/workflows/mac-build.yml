@@ -1,0 +1,51 @@
+name: Build for macOS
+
+# Builds LEparagliding on Apple Silicon and Intel Macs, runs the example design
+# and checks the result against the reference output shipped in lep/.
+# The binaries are attached to the run as downloadable artifacts.
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'lep/leparagliding.f'
+      - 'pre/pre-processor.f'
+      - 'au/ac (fortran version)/ac.f'
+      - 'mac/**'
+      - '.github/workflows/mac-build.yml'
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, macos-15-intel]   # Apple Silicon, Intel
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install gfortran
+        run: |
+          command -v gfortran >/dev/null 2>&1 || brew install gcc
+          ls /opt/homebrew/bin /usr/local/bin 2>/dev/null | grep -i gfortran || true
+
+      - name: Build
+        run: ./mac/build-mac.sh
+
+      - name: Test against the shipped reference output
+        run: ./mac/test-mac.sh
+
+      - name: Package
+        run: |
+          mkdir dist
+          cp lep/lep-*-mac-*.out pre/pre-*-mac-*.out "au/ac (fortran version)"/ac-mac-*.out dist/
+          tar -czf "lep-mac-$(uname -m).tar.gz" -C dist .
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lep-mac-${{ runner.arch }}
+          path: lep-mac-*.tar.gz
+
+      # Last, so the programs are attached to the run even if this fails.
+      - name: Check the programs need no gfortran / Homebrew libraries
+        run: ./mac/check-self-contained.sh
